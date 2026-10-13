@@ -1,0 +1,46 @@
+---
+- name: Deploy Java Application to Kubernetes
+  hosts: local
+  gather_facts: false
+
+  vars:
+    project_root: "{{ playbook_dir }}/.."
+
+  tasks:
+    - name: Apply Kubernetes Deployment
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - apply
+          - -f
+          - "{{ project_root }}/kubernetes/deployment.yaml"
+      register: deployment_result
+      changed_when: "'configured' in deployment_result.stdout or 'created' in deployment_result.stdout"
+
+    - name: Display Deployment Result
+      ansible.builtin.debug:
+        var: deployment_result.stdout
+
+    - name: Apply Kubernetes Service
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - apply
+          - -f
+          - "{{ project_root }}/kubernetes/service.yaml"
+      register: service_result
+      changed_when: "'configured' in service_result.stdout or 'created' in service_result.stdout"
+
+    - name: Display Service Result
+      ansible.builtin.debug:
+        var: service_result.stdout
+
+    - name: Wait for Deployment to become ready
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - rollout
+          - status
+          - deployment/complete-devops-app
+          - --timeout=120s
+      changed_when: false

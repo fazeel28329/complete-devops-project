@@ -1,0 +1,41 @@
+---
+- name: Verify Kubernetes Deployment
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Check Kubernetes nodes
+      ansible.builtin.command: kubectl get nodes
+      register: nodes
+      changed_when: false
+
+    - name: Display Kubernetes nodes
+      ansible.builtin.debug:
+        var: nodes.stdout_lines
+
+    - name: Check Terraform-managed Pods
+      ansible.builtin.command: kubectl get pods -n devops-terraform
+      register: pods
+      changed_when: false
+
+    - name: Display Pods
+      ansible.builtin.debug:
+        var: pods.stdout_lines
+
+    - name: Check Terraform Deployment
+      ansible.builtin.command: kubectl get deployments -n devops-terraform
+      register: deployments
+      changed_when: false
+
+    - name: Display Deployments
+      ansible.builtin.debug:
+        var: deployments.stdout_lines
+
+    - name: Check Terraform Service
+      ansible.builtin.command: kubectl get services -n devops-terraform
+      register: services
+      changed_when: false
+
+    - name: Display Services
+      ansible.builtin.debug:
+        var: services.stdout_lines

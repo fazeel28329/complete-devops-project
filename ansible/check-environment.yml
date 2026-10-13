@@ -1,0 +1,36 @@
+---
+- name: Verify Local DevOps Environment
+  hosts: local
+  gather_facts: true
+
+  tasks:
+    - name: Display operating system
+      ansible.builtin.debug:
+        msg: "Operating System: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Check Java installation
+      ansible.builtin.command: java -version
+      register: java_result
+      changed_when: false
+
+    - name: Display Java version
+      ansible.builtin.debug:
+        msg: "{{ java_result.stderr_lines }}"
+
+    - name: Check Git installation
+      ansible.builtin.command: git --version
+      register: git_result
+      changed_when: false
+
+    - name: Display Git version
+      ansible.builtin.debug:
+        msg: "{{ git_result.stdout }}"
+
+    - name: Check Docker installation
+      ansible.builtin.command: docker --version
+      register: docker_result
+      changed_when: false
+
+    - name: Display Docker version
+      ansible.builtin.debug:
+        msg: "{{ docker_result.stdout }}"
